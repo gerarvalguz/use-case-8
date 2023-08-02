@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
+import { connect } from 'react-redux';
 import validator from 'validator';
 import { setUserForm } from '../store/actions';
+import uuid from 'react-uuid'
 
 const initialState = {
     firstName: '',
     lastName: '',
     email: '',
-    message: ''
+    message: '',
   };
 
 const FormComponent = ({ users, setUserForm }) => {
 const [formValues, setFormValues] = useState(initialState);
 const [formErrors, setFormErrors] = useState({});
+const [isFormValid, setIsFormValid] = useState(false);
 
 const validateForm = () => {
     let errors = {};
@@ -35,70 +38,132 @@ const validateForm = () => {
     return errors;
   };
 
+  const handleValidation = () => {
+    const errors = validateForm();
+    setFormErrors(errors);
+    setIsFormValid(Object.keys(errors).length === 0);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues((prevState) => ({
+      ...prevState,
+      [name]: value
+    }));
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: ''
+    }));
+    handleValidation();
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const errors = validateForm();
-
-    if (Object.keys(errors).length === 0) {      
+    handleValidation();
+    if (isFormValid) {
       setUserForm(formValues);
       setFormValues(initialState);
       setFormErrors({});
-    } else {
-      setFormErrors(errors);
     }
   };
+
 
   return (
     <div>
         <h1>User Form</h1>
         <form onSubmit={handleSubmit}>
         <div>
-            <label>
+            <label 
+                htmlFor="firstName" 
+                className='label'>
                     First Name
             </label>
             <input
             id="firstName"
+            name="firstName"
             type="text"
             value={formValues.firstName}
-            onChange={(e) => setFormValues({ ...formValues, firstName: e.target.value })}
+            className='inputText'
+            onChange={handleChange}
             />
-            {formErrors.firstName && <p>{formErrors.firstName}</p>}
+            {formErrors.firstName && <p>* {formErrors.firstName}</p>}
         </div>
         <div>
-            <label>Last Name</label>
+            <label htmlFor="lastName" className='label'>Last Name</label>
             <input
             id="lastName"
+            name="lastName"
             type="text"
             value={formValues.lastName}
-            onChange={(e) => setFormValues({ ...formValues, lastName: e.target.value })}
+            className='inputText'
+            onChange={handleChange}
             />
-            {formErrors.lastName && <p>{formErrors.lastName}</p>}
+            {formErrors.lastName && <p>* {formErrors.lastName}</p>}
         </div>
         <div>
-            <label>Email</label>
+            <label htmlFor="email" className='label'>Email</label>
             <input
             id="email"
+            name="email"
             type="text"
             value={formValues.email}
-            onChange={(e) => setFormValues({ ...formValues, email: e.target.value })}
+            className='inputText'
+            onChange={handleChange}
             />
-            {formErrors.email && <p>{formErrors.email}</p>}
+            {formErrors.email && <p>* {formErrors.email}</p>}
         </div>
         <div>
-            <label>Message</label>
+            <label htmlFor="message" className='label'>Message</label>
             <textarea
             id="message"
+            name="message"
             value={formValues.message}
-            onChange={(e) => setFormValues({ ...formValues, message: e.target.value })}
+            className='inputText'
+            onChange={handleChange}
             />
-            {formErrors.message && <p>{formErrors.message}</p>}
+            {formErrors.message && <p>* {formErrors.message}</p>}
         </div>
-        <button type="submit" disabled={Object.keys(formErrors).length > 0}>
-            Submit
-        </button>
+        <div>
+            <button 
+                type="submit" 
+                className='button'
+                disabled={!isFormValid}
+            >
+                Submit
+            </button>
+        </div>
         </form>
+        
+        <table>
+            <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Message</th>
+            </tr>
+            </thead>
+            <tbody>
+            {users.map((user, index) => (
+                <tr key={uuid()}>
+                <td>{user.firstName}</td>
+                <td>{user.lastName}</td>
+                <td>{user.email}</td>
+                <td>{user.message}</td>
+                </tr>
+            ))}
+            </tbody>
+        </table>
     </div>    
   );
 };
 
-export default FormComponent
+const mapStateToProps = (state) => ({
+    users: state.users || []
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    setUserForm: (userData) => dispatch(setUserForm(userData))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(FormComponent);
