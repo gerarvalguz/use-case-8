@@ -20,19 +20,19 @@ const validateForm = () => {
     let errors = {};
 
     if (!formValues.firstName.trim()) {
-      errors.firstName = 'First Name required';
+      errors.firstName = '*First Name required';
     }
 
     if (!formValues.lastName.trim()) {
-      errors.lastName = 'Last Name required';
+      errors.lastName = '*Last Name required';
     }
 
     if (!validator.isEmail(formValues.email)) {
-      errors.email = 'Invalid Email';
+      errors.email = '*Invalid Email';
     }
 
     if (formValues.message.length < 10) {
-      errors.message = 'Should be at least 10 characters';
+      errors.message = '*Should be at least 10 characters';
     }
 
     return errors;
@@ -86,7 +86,7 @@ const validateForm = () => {
             className='inputText'
             onChange={handleChange}
             />
-            {formErrors.firstName && <p>* {formErrors.firstName}</p>}
+            {formErrors.firstName && <p>{formErrors.firstName}</p>}
         </div>
         <div>
             <label htmlFor="lastName" className='label'>Last Name</label>
@@ -98,7 +98,7 @@ const validateForm = () => {
             className='inputText'
             onChange={handleChange}
             />
-            {formErrors.lastName && <p>* {formErrors.lastName}</p>}
+            {formErrors.lastName && <p>{formErrors.lastName}</p>}
         </div>
         <div>
             <label htmlFor="email" className='label'>Email</label>
@@ -110,7 +110,7 @@ const validateForm = () => {
             className='inputText'
             onChange={handleChange}
             />
-            {formErrors.email && <p>* {formErrors.email}</p>}
+            {formErrors.email && <p>{formErrors.email}</p>}
         </div>
         <div>
             <label htmlFor="message" className='label'>Message</label>
@@ -120,14 +120,16 @@ const validateForm = () => {
             value={formValues.message}
             className='inputText'
             onChange={handleChange}
+            rows={5}
             />
-            {formErrors.message && <p>* {formErrors.message}</p>}
+            {formErrors.message && <p>{formErrors.message}</p>}
         </div>
         <div>
             <button 
                 type="submit" 
                 className='button'
                 disabled={!isFormValid}
+                {...(!isFormValid && { disabled: false })}
             >
                 Submit
             </button>
@@ -145,7 +147,7 @@ const validateForm = () => {
             </thead>
             <tbody>
             {users.map((user, index) => (
-                <tr key={uuid()}>
+                <tr key={index}>
                 <td>{user.firstName}</td>
                 <td>{user.lastName}</td>
                 <td>{user.email}</td>
