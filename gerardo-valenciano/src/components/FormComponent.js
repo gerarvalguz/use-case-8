@@ -146,8 +146,8 @@ const validateForm = () => {
             </tr>
             </thead>
             <tbody>
-            {users.map((user, index) => (
-                <tr key={index}>
+            {users.map((user) => (
+                <tr key={uuid()}>
                 <td>{user.firstName}</td>
                 <td>{user.lastName}</td>
                 <td>{user.email}</td>
